@@ -14,7 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      findings: {
+        Row: {
+          ai_pattern: string | null
+          category: string
+          compliance: Json
+          created_at: string
+          description: string
+          fix_suggestion: string
+          id: string
+          location: string | null
+          scan_id: string
+          severity: string
+          status: string
+          test_suggestion: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          ai_pattern?: string | null
+          category?: string
+          compliance?: Json
+          created_at?: string
+          description: string
+          fix_suggestion?: string
+          id?: string
+          location?: string | null
+          scan_id: string
+          severity?: string
+          status?: string
+          test_suggestion?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          ai_pattern?: string | null
+          category?: string
+          compliance?: Json
+          created_at?: string
+          description?: string
+          fix_suggestion?: string
+          id?: string
+          location?: string | null
+          scan_id?: string
+          severity?: string
+          status?: string
+          test_suggestion?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "findings_scan_id_fkey"
+            columns: ["scan_id"]
+            isOneToOne: false
+            referencedRelation: "scans"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          display_name: string | null
+          email: string | null
+          id: string
+          org_name: string | null
+        }
+        Insert: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id: string
+          org_name?: string | null
+        }
+        Update: {
+          created_at?: string
+          display_name?: string | null
+          email?: string | null
+          id?: string
+          org_name?: string | null
+        }
+        Relationships: []
+      }
+      scans: {
+        Row: {
+          ai_generated_likelihood: number
+          created_at: string
+          error_message: string | null
+          id: string
+          pr_ref: string | null
+          repo: string | null
+          risk_score: number
+          source_code: string
+          stack: string
+          status: string
+          summary: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          ai_generated_likelihood?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          pr_ref?: string | null
+          repo?: string | null
+          risk_score?: number
+          source_code: string
+          stack?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          user_id: string
+        }
+        Update: {
+          ai_generated_likelihood?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          pr_ref?: string | null
+          repo?: string | null
+          risk_score?: number
+          source_code?: string
+          stack?: string
+          status?: string
+          summary?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
