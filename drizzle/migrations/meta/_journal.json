@@ -8,6 +8,13 @@
       "when": 1790087721749,
       "tag": "0000_create_scans_and_findings",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1790131987227,
+      "tag": "0001_remediation_board",
+      "breakpoints": true
     }
   ]
 }
