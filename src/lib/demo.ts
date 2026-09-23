@@ -1,4 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 import { SAMPLE_DIFF } from "./security";
 
 const DEMO_FINDINGS = [
@@ -123,7 +124,12 @@ export async function seedDemoReview(userId: string) {
   if (error || !scan) throw new Error(error?.message ?? "Could not create the demo review.");
 
   const { error: findingsError } = await supabase.from("findings").insert(
-    DEMO_FINDINGS.map((f) => ({ ...f, scan_id: scan.id, user_id: userId })),
+    DEMO_FINDINGS.map((f) => ({
+      ...f,
+      compliance: f.compliance as unknown as Json,
+      scan_id: scan.id,
+      user_id: userId,
+    })),
   );
   if (findingsError) throw new Error(findingsError.message);
 
