@@ -14,13 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      finding_events: {
+        Row: {
+          created_at: string
+          detail: string
+          finding_id: string
+          id: string
+          kind: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string
+          finding_id: string
+          id?: string
+          kind?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string
+          finding_id?: string
+          id?: string
+          kind?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "finding_events_finding_id_fkey"
+            columns: ["finding_id"]
+            isOneToOne: false
+            referencedRelation: "findings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       findings: {
         Row: {
           ai_pattern: string | null
+          assignee: string | null
           category: string
           compliance: Json
           created_at: string
           description: string
+          due_date: string | null
           fix_suggestion: string
           id: string
           location: string | null
@@ -29,14 +66,17 @@ export type Database = {
           status: string
           test_suggestion: string
           title: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           ai_pattern?: string | null
+          assignee?: string | null
           category?: string
           compliance?: Json
           created_at?: string
           description: string
+          due_date?: string | null
           fix_suggestion?: string
           id?: string
           location?: string | null
@@ -45,14 +85,17 @@ export type Database = {
           status?: string
           test_suggestion?: string
           title: string
+          updated_at?: string
           user_id: string
         }
         Update: {
           ai_pattern?: string | null
+          assignee?: string | null
           category?: string
           compliance?: Json
           created_at?: string
           description?: string
+          due_date?: string | null
           fix_suggestion?: string
           id?: string
           location?: string | null
@@ -61,6 +104,7 @@ export type Database = {
           status?: string
           test_suggestion?: string
           title?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: [
