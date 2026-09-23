@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { ShieldCheck, LayoutDashboard, ScanLine, LogOut } from "lucide-react";
+import { ShieldCheck, LayoutDashboard, ScanLine, KanbanSquare, ScrollText, LogOut } from "lucide-react";
 import type { ReactNode } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/dashboard", label: "Reviews", icon: LayoutDashboard },
   { to: "/new", label: "New review", icon: ScanLine },
+  { to: "/board", label: "Fix board", icon: KanbanSquare },
+  { to: "/policy", label: "Policy", icon: ScrollText },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
