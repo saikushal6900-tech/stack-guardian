@@ -1,7 +1,8 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Loader2, ShieldAlert } from "lucide-react";
+import { Github, Loader2, ShieldAlert } from "lucide-react";
+import { fetchPullRequestDiff, listPullRequests } from "@/lib/github.functions";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -50,6 +51,47 @@ function NewReview() {
   const [stack, setStack] = useState<string>("auto");
   const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
+  const listPulls = useServerFn(listPullRequests);
+  const fetchDiff = useServerFn(fetchPullRequestDiff);
+  const [ghRepo, setGhRepo] = useState("");
+  const [pulls, setPulls] = useState<Awaited<ReturnType<typeof listPullRequests>> | null>(null);
+  const [ghBusy, setGhBusy] = useState<string | null>(null);
+
+  async function loadPulls() {
+    setGhBusy("list");
+    try {
+      const result = await listPulls({ data: { repo: ghRepo.trim() } });
+      setPulls(result);
+      if (result.length === 0) toast.message("No open pull requests in that repository.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not reach GitHub.");
+    } finally {
+      setGhBusy(null);
+    }
+  }
+
+  async function importPull(pullNumber: number) {
+    setGhBusy(String(pullNumber));
+    try {
+      const pr = await fetchDiff({ data: { repo: ghRepo.trim(), pullNumber } });
+      setCode(pr.diff);
+      setRepo(ghRepo.trim());
+      setPrRef(`PR #${pr.number}`);
+      setTitle(pr.title);
+      const lang = (pr.language ?? "").toLowerCase();
+      if (lang === "python") setStack("python-django-aws");
+      else if (lang === "typescript" || lang === "javascript") setStack("node-ts-aws");
+      else if (lang === "hcl") setStack("terraform");
+      toast.success(
+        `Imported ${pr.changedFiles} changed files${pr.truncated ? " (diff truncated)" : ""}.`,
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not load that pull request.");
+    } finally {
+      setGhBusy(null);
+    }
+  }
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -93,6 +135,50 @@ function NewReview() {
           Paste the diff or the changed files. Findings come back with the DPDP or RBI clause they
           touch, a fix, and a test.
         </p>
+      </div>
+
+      <div className="panel space-y-4 p-6">
+        <div className="flex items-center gap-2">
+          <Github className="size-4 text-primary" />
+          <p className="text-sm font-medium">Import from GitHub</p>
+        </div>
+        <div className="flex gap-2">
+          <Input
+            placeholder="owner/repository"
+            value={ghRepo}
+            onChange={(e) => setGhRepo(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && ghRepo.trim()) loadPulls();
+            }}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!ghRepo.trim() || ghBusy !== null}
+            onClick={loadPulls}
+          >
+            {ghBusy === "list" && <Loader2 className="size-4 animate-spin" />}
+            List open PRs
+          </Button>
+        </div>
+        {pulls && pulls.length > 0 ? (
+          <div className="divide-y divide-border rounded-md border border-border">
+            {pulls.map((p) => (
+              <button
+                key={p.number}
+                type="button"
+                disabled={ghBusy !== null}
+                onClick={() => importPull(p.number)}
+                className="flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-secondary/40"
+              >
+                <span className="font-mono text-xs text-muted-foreground">#{p.number}</span>
+                <span className="min-w-0 flex-1 truncate text-sm">{p.title}</span>
+                <span className="font-mono text-[11px] text-muted-foreground">{p.author}</span>
+                {ghBusy === String(p.number) && <Loader2 className="size-4 animate-spin" />}
+              </button>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <form onSubmit={submit} className="panel space-y-5 p-6">
